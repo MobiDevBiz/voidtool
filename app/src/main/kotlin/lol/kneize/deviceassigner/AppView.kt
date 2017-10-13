@@ -43,7 +43,11 @@ class AppView : View() {
                     button("Run") {
                         isDefaultButton = true
                         maxWidth = Double.MAX_VALUE
-                        setOnAction { shakeStage() }
+                        setOnAction {
+                            runLater {
+                                logsField.appendText(appController.collectLogs())
+                            }
+                        }
                     }
                     button ( "Clear logs" ) {
                         maxWidth = Double.MAX_VALUE
@@ -72,6 +76,7 @@ class AppView : View() {
                         vgrow = Priority.ALWAYS
                         isWrapText = false
                         isEditable = false
+
                     }
                 }
             }

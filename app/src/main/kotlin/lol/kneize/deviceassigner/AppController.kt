@@ -3,15 +3,14 @@ package lol.kneize.deviceassigner
 import javafx.application.Platform
 import tornadofx.Controller
 import tornadofx.FX
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class AppController : Controller() {
     val appView: AppView by inject()
 
     fun init() {
         with (config) {
-            if (containsKey(USERNAME) && containsKey(PASSWORD))
-                tryLogin(string(USERNAME), string(PASSWORD), true)
-            else
                 showLoginScreen("!")
         }
     }
@@ -30,28 +29,16 @@ class AppController : Controller() {
         }
     }
 
-    fun tryLogin(username: String, password: String, remember: Boolean) {
-        runAsync {
-            username == "admin" && password == "secret"
-        } ui { successfulLogin ->
 
-            if (successfulLogin) {
-                appView.clear()
+    fun collectLogs(): String {
+        val proc = ProcessBuilder("idevicesyslog.exe")
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectError(ProcessBuilder.Redirect.PIPE)
+                .start()
 
-                if (remember) {
-                    with (config) {
-                        set(USERNAME to username)
-                        set(PASSWORD to password)
-                        save()
-                    }
-                }
-
-            } else {
-                showLoginScreen("Login failed. Please try again.", true)
-            }
-        }
+        proc.waitFor(60, TimeUnit.MINUTES)
+        return proc.inputStream.bufferedReader().readText()
     }
-
 
 
     fun exit() {
