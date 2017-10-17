@@ -7,6 +7,7 @@ import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.*
+import javafx.scene.text.Font.font
 import javafx.util.Duration
 import tornadofx.*
 import tornadofx.Stylesheet.Companion.label
@@ -44,28 +45,33 @@ class AppView : View() {
                         isDefaultButton = true
                         maxWidth = Double.MAX_VALUE
                         setOnAction {
-                            runLater {
-                                logsField.appendText(appController.collectLogs())
-                            }
+                            appController.startCollectingLogs()
+                        }
+                    }
+                    button("Stop") {
+                        maxWidth = Double.MAX_VALUE
+                        setOnAction {
+                            appController.stopCollectingLogs()
                         }
                     }
                     button ( "Clear logs" ) {
                         maxWidth = Double.MAX_VALUE
-                        setOnAction { println("'Clear' is pressed") }
+                        setOnAction { appController.clearLogs() }
 
                     }
                     button ( "To clipboard" ) {
                         maxWidth = Double.MAX_VALUE
-                        setOnAction { println("'Copy to clipboard' is pressed") }
+                        setOnAction { appController.copyToClipboard() }
                     }
                     button ( "To File" ) {
                         maxWidth = Double.MAX_VALUE
-                        setOnAction { println("'Save to clipboard' is pressed") }
+                        setOnAction { appController.copyToFile() }
                     }
                     button ( "Exit" ) {
                         maxWidth = Double.MAX_VALUE
                         setOnAction {appController.exit()}
                     }
+
                 }
             }
             center {
@@ -76,6 +82,7 @@ class AppView : View() {
                         vgrow = Priority.ALWAYS
                         isWrapText = false
                         isEditable = false
+                        font = font("Monospaced")
 
                     }
                 }
@@ -89,6 +96,10 @@ class AppView : View() {
 
     fun clear() {
 //
+    }
+
+    fun appendLogs(logs: String) {
+        logsField.appendText(logs)
     }
 
     fun shakeStage() {

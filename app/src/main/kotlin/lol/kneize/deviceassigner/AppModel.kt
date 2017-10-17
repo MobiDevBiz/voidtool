@@ -11,7 +11,7 @@ class AppModel : App(AppView::class) {
     override fun start(stage: Stage) {
         importStylesheet(Styles::class)
         super.start(stage)
-        appController.init()
+
     }
 }
 
