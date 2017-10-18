@@ -9,6 +9,10 @@ buildscript {
     }
 }
 
+plugins {
+	id 'com.github.johnrengelman.shadow' version '2.0.1' apply false
+}
+
 allprojects {
 	group 'lol.kneize'
 	version '1.0-SNAPSHOT'
