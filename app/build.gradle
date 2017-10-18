@@ -1,5 +1,6 @@
 plugins {
 	id 'kotlin'
+	id 'application'
 	id 'com.github.johnrengelman.shadow'
 }
 
@@ -7,6 +8,8 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile 'no.tornado:tornadofx:1.7.11'
 }
+
+mainClassName = 'lol.kneize.deviceassigner.AppModel'
 
 sourceCompatibility = 9
 targetCompatibility = 9
