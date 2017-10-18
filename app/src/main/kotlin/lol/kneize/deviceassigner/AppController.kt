@@ -6,15 +6,12 @@ import tornadofx.Controller
 import tornadofx.FX
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-import sun.text.normalizer.UTF16.append
-import jdk.nashorn.internal.runtime.ScriptingFunctions.readLine
 import tornadofx.runLater
 import javafx.scene.input.ClipboardContent
 import tornadofx.FileChooserMode
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 class AppController : Controller() {
     val appView: AppView by inject()
