@@ -10,9 +10,11 @@ import javafx.scene.layout.*
 import javafx.scene.text.Font.font
 import javafx.util.Duration
 import tornadofx.*
-import tornadofx.Stylesheet.Companion.label
 import lol.kneize.deviceassigner.Styles.Companion
 import java.util.*
+
+
+
 
 class AppView : View() {
     override val root = BorderPane()
@@ -94,12 +96,13 @@ class AppView : View() {
         }
     }
 
-    fun clear() {
-//
-    }
-
     fun appendLogs(logs: String) {
+        val pos = logsField.getScrollTop()
+        val anchor = logsField.getAnchor()
+        val caret = logsField.getCaretPosition()
         logsField.appendText(logs)
+        logsField.setScrollTop(pos)
+        logsField.selectRange(anchor, caret)
     }
 
     fun shakeStage() {
@@ -129,6 +132,4 @@ class AppView : View() {
         timeline.play()
     }
 }
-private operator fun CssRule.invoke(s: String) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
+
