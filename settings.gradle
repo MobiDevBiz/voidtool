@@ -1,2 +1,3 @@
-rootProject.name = 'deviceassigner'
+rootProject.name = 'idevicesyslog.gui'
 include 'app'
+

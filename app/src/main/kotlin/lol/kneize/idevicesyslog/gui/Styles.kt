@@ -1,4 +1,4 @@
-package lol.kneize.deviceassigner
+package lol.kneize.idevicesyslog.gui
 
 import tornadofx.Stylesheet
 import tornadofx.box

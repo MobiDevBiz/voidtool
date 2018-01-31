@@ -1,4 +1,4 @@
-package lol.kneize.deviceassigner
+package lol.kneize.idevicesyslog.gui
 
 import javafx.application.Platform
 import javafx.scene.input.Clipboard
@@ -28,10 +28,10 @@ class AppController : Controller() {
         }
     }
 
-    private val serviceMessageRegex = Regex("""^\[\w+]""")
-    private val syslogMessageRegex = Regex("""^\w{3}\s+\d+\s\d+:\d+:\d+\s+[\w-\d]+\s.*?:\s(.*)$""")
-
-    private val applicationMessageRegex = Regex("""^\[(\w)+:\d+]\s*(.*)""")
+//    private val serviceMessageRegex = Regex("""^\[\w+]""")
+//    private val syslogMessageRegex = Regex("""^\w{3}\s+\d+\s\d+:\d+:\d+\s+[\w-\d]+\s.*?:\s(.*)$""")
+//
+//    private val applicationMessageRegex = Regex("""^\[(\w)+:\d+]\s*(.*)""")
 
 
     fun startCollectingLogs() {
@@ -50,29 +50,29 @@ class AppController : Controller() {
                 index++
                 val line = reader.readLine() ?: break
 
-                val serviceMessageMatch = serviceMessageRegex.find(line)
-                if(serviceMessageMatch != null) {
-                    runLater { appView.appendLogs("Keyword is: ${serviceMessageMatch.groupValues[1]}\n") }
-                } else {
-                    if(syslog) {
-                        buffer = matches[1]
-                    } else {
-                        buffer += line
-                        continue
-                    }
-                }
+//                val serviceMessageMatch = serviceMessageRegex.find(line)
+//                if(serviceMessageMatch != null) {
+                    runLater { appView.appendLogs(line + '\n')}//s()"Keyword is: ${serviceMessageMatch.groupValues[1]}\n") }}
+//                } else {
+//                    if(syslog) {
+//                        buffer = matches[1]
+//                    } else {
+//                        buffer += line
+//                        continue
+//                    }
+//                }
+//
+//                process buffer
 
-                process buffer
 
-
-                when {
-                    applicationMessageRegex.matches(line) -> runLater {
-                        appView.appendLogs(line + '\n')
-                        println(line)
-                    }
-                    line.contains(appView.keyword.value, ignoreCase = true) -> runLater { appView.appendLogs("Keyword is: ${appView.keyword} $line\n") }
-                    else -> runLater { println(line) }//stopCollectingLogs()
-                }
+//                when {
+//                    applicationMessageRegex.matches(line) -> runLater {
+//                        appView.appendLogs(line + '\n')
+//                        println(line)
+//                    }
+//                    line.contains(appView.keyword.value, ignoreCase = true) -> runLater { appView.appendLogs("Keyword is: ${appView.keyword} $line\n") }
+//                    else -> runLater { println(line) }//stopCollectingLogs()
+//                }
 //                if (line.contains(appView.keyword.toString(), ignoreCase = true)) {
 //                    runLater {
 //                        appView.appendLogs(line + '\n')
@@ -88,7 +88,7 @@ class AppController : Controller() {
         if(proc != null) {
             proc.destroy()
         }
-        runLater { appView.appendLogs("[disconnected]") }
+        runLater { appView.appendLogs("[disconnected]" + '\n') }
 
     }
 
@@ -109,8 +109,9 @@ class AppController : Controller() {
         root.mkdirs()
         val fileName = "syslog-" + SimpleDateFormat("yyyy-MM-dd-hh-mm-ss").format(Date()) + ".txt"
         val syslog = File(root, fileName)
+        val fullPath = syslog.absolutePath
         syslog.writeText(appView.logsField.getText(0,appView.logsField.length).toString())
-        appView.appendLogs("[idevicesyslog] Stack is saved to: " + fileName + '\n')
+        appView.appendLogs("[idevicesyslog] Stack is saved to: " + fullPath + '\n')
     }
 
     fun clearLogs() {

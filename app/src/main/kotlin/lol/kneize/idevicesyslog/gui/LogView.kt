@@ -1,4 +1,4 @@
-package lol.kneize.deviceassigner
+package lol.kneize.idevicesyslog.gui
 
 import javafx.animation.Animation
 import javafx.animation.KeyFrame

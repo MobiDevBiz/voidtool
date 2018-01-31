@@ -1,0 +1,8 @@
+[connected]
+Jan 29 18:33:55 iPad-Pro-97-4254 nsurlsessiond[95] <Notice>: Triggering periodic update to powerlog for client <private>
+Jan 29 18:33:55 iPad-Pro-97-4254 identityservicesd[49] <Notice>: Beginning cleanup of outgoing message database
+Jan 29 18:33:55 iPad-Pro-97-4254 identityservicesd[49] <Notice>: Cleaned up 0 expired messages
+Jan 29 18:33:55 iPad-Pro-97-4254 identityservicesd[49] <Notice>: Beginning cleanup of outgoing message database for quickswitched messages
+Jan 29 18:33:55 iPad-Pro-97-4254 identityservicesd[49] <Notice>: Ending cleanup of outgoing message database for quickswitched messages
+[disconnected]
+[idevicesyslog] Selection is saved to clipboard

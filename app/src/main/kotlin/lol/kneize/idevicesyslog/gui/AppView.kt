@@ -1,4 +1,4 @@
-package lol.kneize.deviceassigner
+package lol.kneize.idevicesyslog.gui
 
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
@@ -14,7 +14,7 @@ import javafx.scene.paint.Paint.valueOf
 import javafx.scene.text.Font.font
 import javafx.util.Duration
 import tornadofx.*
-import lol.kneize.deviceassigner.Styles.Companion
+import lol.kneize.idevicesyslog.gui.Styles.Companion
 import sun.management.Agent.getText
 import java.util.*
 
@@ -73,10 +73,10 @@ class AppView : View() {
                     padding = tornadofx.insets(10.0)
                     alignment = Pos.CENTER_RIGHT
 
-                    textfield ("justenergy"){
-                        maxWidth = Double.MAX_VALUE
-                        bind(keyword)
-                    }
+//                    textfield ("justenergy"){
+//                        maxWidth = Double.MAX_VALUE
+//                        bind(keyword)
+//                    }
 
                     button("Run") {
                         isDefaultButton = true
@@ -85,6 +85,12 @@ class AppView : View() {
                             appController.startCollectingLogs()
                         }
                     }
+//                    button("GC") {
+//                        maxWidth = Double.MAX_VALUE
+//                        setOnAction {
+//                            System.gc()
+//                        }
+//                   }
                     button("Stop") {
                         maxWidth = Double.MAX_VALUE
                         setOnAction {
@@ -124,7 +130,7 @@ class AppView : View() {
 //                        style {
 //                            backgroundColor += Color.DARKSLATEGRAY
 //                        }
-                        font = font("Monospaced", 14.0)
+                        font = font("Monospaced", 16.0)
 //                        font = font(12.0)
 
 
