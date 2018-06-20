@@ -35,8 +35,9 @@ class AppView : View() {
     var saveToFileButton: Button by singleAssign()
     var stopButton: Button by singleAssign()
     var exitButton: Button by singleAssign()
-    var keyField: TextField by singleAssign()
-    var keyword = SimpleStringProperty()
+    //var keyWordField: TextField by singleAssign()
+    var keyWordField = textfield()
+    var keyWord = keyWordField.text
 
 
 
@@ -44,39 +45,22 @@ class AppView : View() {
         title = "iOS system logs (libimobiledevice-idevicesyslog)"
 
         with (root) {
-            addClass(Companion.appview)
-
             style {
                 padding = box(0.px)
             }
-//            top {
-//                controls = hbox (10.0, Pos.CENTER){
-//                    padding = tornadofx.insets(10.0)
-//
-//
-//                    togglebutton ("Show Timestamp") {
-//                        //LogView.showTimeStampProperty().bind(showTimestamp.selectedProperty())
-//                    }
-//                    togglebutton ("Tail") {
-//                        //
-//                    }
-//                    togglebutton ("Pause") {
-//                        //
-//                    }
-//                    slider(0.1, 60.0, 60.0) {
-//                        //
-//                    }
-//                }
-//            }
             right {
                 rPanel = vbox(10.0) {
                     padding = tornadofx.insets(10.0)
                     alignment = Pos.CENTER_RIGHT
 
-//                    textfield ("justenergy"){
-//                        maxWidth = Double.MAX_VALUE
-//                        bind(keyword)
-//                    }
+                    keyWordField = textfield()
+
+                    button("Apply filter"){
+                        maxWidth = Double.MAX_VALUE
+                        setOnAction {
+                            keyWord = keyWordField.text
+                        }
+                    }
 
                     button("Run") {
                         isDefaultButton = true
@@ -85,12 +69,7 @@ class AppView : View() {
                             appController.startCollectingLogs()
                         }
                     }
-//                    button("GC") {
-//                        maxWidth = Double.MAX_VALUE
-//                        setOnAction {
-//                            System.gc()
-//                        }
-//                   }
+
                     button("Stop") {
                         maxWidth = Double.MAX_VALUE
                         setOnAction {
@@ -110,6 +89,19 @@ class AppView : View() {
                         maxWidth = Double.MAX_VALUE
                         setOnAction { appController.copyToFile() }
                     }
+
+                    button("Open logs folder") {
+                        maxWidth = Double.MAX_VALUE
+                        setOnAction { appController.openLogsFolder() }
+                    }
+
+                    button("Make screenshot") {
+                        maxWidth = Double.MAX_VALUE
+                        setOnAction {
+                            appController.makeScreenshot()
+                        }
+                    }
+
                     button ( "Exit" ) {
                         maxWidth = Double.MAX_VALUE
                         setOnAction {appController.exit()}
@@ -157,7 +149,9 @@ class AppView : View() {
 //        {
 //            logs.toString()
 //        }
+
         logsField.appendText(logs)
+
 //        logsField.setScrollTop(pos)
 //        logsField.selectRange(anchor, caret)
     }

@@ -7,9 +7,19 @@ import tornadofx.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import java.io.IOException
+import lol.kneize.idevicesyslog.gui.WindowsActions.openDirectoryViewer
+import java.nio.file.Files
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ofPattern
+
 
 class AppController : Controller() {
     val appView: AppView by inject()
+
     var proc: Process? = null
 
     
@@ -28,11 +38,10 @@ class AppController : Controller() {
         }
     }
 
-//    private val serviceMessageRegex = Regex("""^\[\w+]""")
-//    private val syslogMessageRegex = Regex("""^\w{3}\s+\d+\s\d+:\d+:\d+\s+[\w-\d]+\s.*?:\s(.*)$""")
-//
-//    private val applicationMessageRegex = Regex("""^\[(\w)+:\d+]\s*(.*)""")
-
+    private val serviceMessageRegex = Regex("""^\[\w+]""")
+    private val syslogMessageRegex = Regex("""^(\w{3})\s+\d+\s\d+:\d+:\d+\s+[\w-\d]+\s.*?:\s(.*)$""")
+    private val applicationMessageRegex = Regex("""^\[(\w)+:\d+]\s*(.*)""")
+    private val devicePropertyRegex = Regex("""^(\w+:\s)(.*)$""")
 
     fun startCollectingLogs() {
         runAsync {
@@ -41,53 +50,31 @@ class AppController : Controller() {
                     .redirectError(ProcessBuilder.Redirect.PIPE)
                     .start() as Process
             this@AppController.proc = proc
-
             val reader = proc.inputStream.bufferedReader()
-            var index = 0
-            var start = 0
-            var end = 0
-            while(true) {
-                index++
+            var switch = false
+            while (true) {
                 val line = reader.readLine() ?: break
-
-//                val serviceMessageMatch = serviceMessageRegex.find(line)
-//                if(serviceMessageMatch != null) {
-                    runLater { appView.appendLogs(line + '\n')}//s()"Keyword is: ${serviceMessageMatch.groupValues[1]}\n") }}
-//                } else {
-//                    if(syslog) {
-//                        buffer = matches[1]
-//                    } else {
-//                        buffer += line
-//                        continue
-//                    }
-//                }
-//
-//                process buffer
-
-
-//                when {
-//                    applicationMessageRegex.matches(line) -> runLater {
-//                        appView.appendLogs(line + '\n')
-//                        println(line)
-//                    }
-//                    line.contains(appView.keyword.value, ignoreCase = true) -> runLater { appView.appendLogs("Keyword is: ${appView.keyword} $line\n") }
-//                    else -> runLater { println(line) }//stopCollectingLogs()
-//                }
-//                if (line.contains(appView.keyword.toString(), ignoreCase = true)) {
-//                    runLater {
-//                        appView.appendLogs(line + '\n')
-//                    }
-//                } else {stopCollectingLogs()}
+                if (line.matches(serviceMessageRegex)) {
+                    runLater { appView.appendLogs(line + '\n') }
+                } else if (line.matches(applicationMessageRegex)) {
+                    runLater { appView.appendLogs(line + '\n') }
+                } else if (line.matches(syslogMessageRegex)) {
+                    if (appView.keyWord.isEmpty()) {
+                        runLater { appView.appendLogs(line + '\n') }
+                    } else if (appView.keyWord.isNotEmpty() && line.contains(appView.keyWord, ignoreCase = true)) {
+                        switch = !switch
+                        runLater { appView.appendLogs(line + '\n') }
+                    }
+                } else if (!line.matches(applicationMessageRegex) && switch) {
+                    runLater { appView.appendLogs(line + '\n') }
+                }
             }
         }
     }
 
     fun stopCollectingLogs() {
-        val proc = this.proc
         this.proc = null
-        if(proc != null) {
-            proc.destroy()
-        }
+        this.proc?.destroy()
         runLater { appView.appendLogs("[disconnected]" + '\n') }
 
     }
@@ -110,8 +97,75 @@ class AppController : Controller() {
         val fileName = "syslog-" + SimpleDateFormat("yyyy-MM-dd-hh-mm-ss").format(Date()) + ".txt"
         val syslog = File(root, fileName)
         val fullPath = syslog.absolutePath
-        syslog.writeText(appView.logsField.getText(0,appView.logsField.length).toString())
-        appView.appendLogs("[idevicesyslog] Stack is saved to: " + fullPath + '\n')
+        try {
+            syslog.writeText(appView.logsField.getText(0,appView.logsField.length).toString())
+        } catch (e: IOException) {e.printStackTrace()}
+        appView.appendLogs("[idevicesyslog] Stack is saved to: $fullPath\n")
+    }
+    fun openLogsFolder(){
+        val targetDir = System.getProperty("user.dir")
+        val path = String.format("%s/logs", targetDir)
+        val root = File(path)
+
+        openDirectoryViewer(root)
+        appView.appendLogs("[idevicesyslog] root was: $root\n")
+
+    }
+
+//    private fun getDeviceInfo(property: String): String? {
+//        val proc = ProcessBuilder("ideviceinfo.exe")
+//                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+//                .redirectError(ProcessBuilder.Redirect.PIPE)
+//                .start() as Process
+//        this@AppController.proc = proc
+//        proc.inputStream.reader().
+//
+////        return    proc.inputStream
+////                .bufferedReader()
+////                .readLines()
+////                .firstOrNull {
+////                    it.contains(property, ignoreCase = true)
+////                }?.let { devicePropertyRegex.matchEntire(it)?.groupValues?.get(1)}
+//    }
+
+    fun mountDevImage() {
+        //val productVersion = getDeviceInfo("ProductVersion")
+        val argument = "./dev_image/11.4/DeveloperDiskImage.dmg ./dev_image/11.4/DeveloperDiskImage.dmg.signature"
+        val targetDir = System.getProperty("user.dir")
+        val path = String.format("%s/dev_image", targetDir)
+
+
+        val proc = ProcessBuilder("ideviceimagemounter.exe", "$targetDir\\dev_image\\11.4\\DeveloperDiskImage.dmg $targetDir\\dev_image\\11.4\\DeveloperDiskImage.dmg.signature")
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectError(ProcessBuilder.Redirect.PIPE)
+                .start() as Process
+        this@AppController.proc = proc
+        val reader = proc.inputStream?.bufferedReader()
+
+        while (true) {
+            val line = reader!!.readLine() ?: break
+            runLater {appView.appendLogs("[ideviceimagemounter] $line")}
+        }
+    }
+
+    fun makeScreenshot(){
+        mountDevImage()
+        val timestamp = LocalDateTime.now().format(ofPattern("yyyy-MM-dd-HH-mm-ss"))
+        val targetDir = System.getProperty("user.dir")
+        val path = String.format("%s\\screenshots", targetDir)
+        val argument = " $path\\screenshot-$timestamp.tiff"
+        print(argument)
+        val proc = ProcessBuilder("idevicescreenshot.exe", argument)
+        //val proc = ProcessBuilder("idevicescreenshot.exe", "$targetDir\\screenshots\\screenshot-$timestamp.png")
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectError(ProcessBuilder.Redirect.PIPE)
+                .start() as Process
+        this@AppController.proc = proc
+        val reader = proc.inputStream?.bufferedReader()
+        val line = reader?.readLine()
+        if (line != null) {
+            appView.appendLogs("[idevicescreenshot] $line\n")
+        }
     }
 
     fun clearLogs() {
@@ -123,9 +177,4 @@ class AppController : Controller() {
         stopCollectingLogs()
         Platform.exit()
     }
-
-
-
-
-
 }
