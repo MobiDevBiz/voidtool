@@ -93,8 +93,14 @@ class AppController : Controller() {
         root.mkdirs()
         val fileName = "syslog-" + SimpleDateFormat("yyyy-MM-dd-hh-mm-ss").format(Date()) + ".txt"
         val syslog = File(root, fileName)
+        val iPad = getDeviceInfo("ProductType:")
+        val iOSVersion = getDeviceInfo("ProductVersion:")
         try {
-            syslog.writeText(appView.logsField.getText(0,appView.logsField.length).toString())
+            syslog.writeText("============================================\r\n")
+            syslog.appendText("iPad Model: $iPad\r\n")
+            syslog.appendText("iOS Version: $iOSVersion\r\n")
+            syslog.appendText("============================================\r\n")
+            syslog.appendText(appView.logsField.getText(0,appView.logsField.length).toString())
         } catch (e: IOException) {e.printStackTrace()}
         appView.appendLogs("[idevicesyslog] Stack is saved to: $syslog\n")
     }
@@ -104,21 +110,20 @@ class AppController : Controller() {
         val root = File(targetDir)
         openDirectoryViewer(root)
         appView.appendLogs("[idevicesyslog] Opened folder: $targetDir\n")
-
     }
 
-    private fun getDeviceInfo(property: String): String? {
+    private fun getDeviceInfo(property: String): String {
         val proc = ProcessBuilder("ideviceinfo.exe")
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process
         this@AppController.proc = proc
-        return    proc.inputStream
+        return proc.inputStream
                 .bufferedReader()
                 .readLines()
                 .firstOrNull {
                     it.contains(property, ignoreCase = true)
-                }?.let { devicePropertyRegex.matchEntire(it)?.groupValues?.get(2)}
+                }?.let { devicePropertyRegex.matchEntire(it)?.groupValues?.get(2)}!!
     }
 
     fun mountDevImage() {
