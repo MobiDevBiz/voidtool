@@ -9,11 +9,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.io.IOException
 import lol.kneize.idevicesyslog.gui.WindowsActions.openDirectoryViewer
-import java.nio.file.Files
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ofPattern
 
 
@@ -54,16 +50,16 @@ class AppController : Controller() {
             var switch = false
             while (true) {
                 val line = reader.readLine() ?: break
-                if (line.matches(serviceMessageRegex)) {
-                    runLater { appView.appendLogs(line + '\n') }
-                } else if (line.matches(applicationMessageRegex)) {
+                if (line.matches(serviceMessageRegex) || line.matches(applicationMessageRegex)) {
                     runLater { appView.appendLogs(line + '\n') }
                 } else if (line.matches(syslogMessageRegex)) {
                     if (appView.keyWord.isEmpty()) {
                         runLater { appView.appendLogs(line + '\n') }
+                        runLater { System.gc() }
                     } else if (appView.keyWord.isNotEmpty() && line.contains(appView.keyWord, ignoreCase = true)) {
                         switch = !switch
                         runLater { appView.appendLogs(line + '\n') }
+                        runLater { System.gc() }
                     }
                 } else if (!line.matches(applicationMessageRegex) && switch) {
                     runLater { appView.appendLogs(line + '\n') }
@@ -89,6 +85,7 @@ class AppController : Controller() {
             appView.appendLogs("[idevicesyslog] Selection is saved to clipboard" + '\n')
         }
     }
+
     fun copyToFile() {
         val targetDir = System.getProperty("user.dir")
         val path = String.format("%s/logs", targetDir)
@@ -96,52 +93,44 @@ class AppController : Controller() {
         root.mkdirs()
         val fileName = "syslog-" + SimpleDateFormat("yyyy-MM-dd-hh-mm-ss").format(Date()) + ".txt"
         val syslog = File(root, fileName)
-        val fullPath = syslog.absolutePath
         try {
             syslog.writeText(appView.logsField.getText(0,appView.logsField.length).toString())
         } catch (e: IOException) {e.printStackTrace()}
-        appView.appendLogs("[idevicesyslog] Stack is saved to: $fullPath\n")
+        appView.appendLogs("[idevicesyslog] Stack is saved to: $syslog\n")
     }
-    fun openLogsFolder(){
+
+    fun openWorkingDir(){
         val targetDir = System.getProperty("user.dir")
-        val path = String.format("%s/logs", targetDir)
-        val root = File(path)
-
+        val root = File(targetDir)
         openDirectoryViewer(root)
-        appView.appendLogs("[idevicesyslog] root was: $root\n")
+        appView.appendLogs("[idevicesyslog] Opened folder: $targetDir\n")
 
     }
 
-//    private fun getDeviceInfo(property: String): String? {
-//        val proc = ProcessBuilder("ideviceinfo.exe")
-//                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-//                .redirectError(ProcessBuilder.Redirect.PIPE)
-//                .start() as Process
-//        this@AppController.proc = proc
-//        proc.inputStream.reader().
-//
-////        return    proc.inputStream
-////                .bufferedReader()
-////                .readLines()
-////                .firstOrNull {
-////                    it.contains(property, ignoreCase = true)
-////                }?.let { devicePropertyRegex.matchEntire(it)?.groupValues?.get(1)}
-//    }
+    private fun getDeviceInfo(property: String): String? {
+        val proc = ProcessBuilder("ideviceinfo.exe")
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectError(ProcessBuilder.Redirect.PIPE)
+                .start() as Process
+        this@AppController.proc = proc
+        return    proc.inputStream
+                .bufferedReader()
+                .readLines()
+                .firstOrNull {
+                    it.contains(property, ignoreCase = true)
+                }?.let { devicePropertyRegex.matchEntire(it)?.groupValues?.get(2)}
+    }
 
     fun mountDevImage() {
-        //val productVersion = getDeviceInfo("ProductVersion")
-        val argument = "./dev_image/11.4/DeveloperDiskImage.dmg ./dev_image/11.4/DeveloperDiskImage.dmg.signature"
+        val productVersion = getDeviceInfo("ProductVersion")
         val targetDir = System.getProperty("user.dir")
-        val path = String.format("%s/dev_image", targetDir)
-
-
-        val proc = ProcessBuilder("ideviceimagemounter.exe", "$targetDir\\dev_image\\11.4\\DeveloperDiskImage.dmg $targetDir\\dev_image\\11.4\\DeveloperDiskImage.dmg.signature")
+        val str = "$targetDir\\dev_image\\$productVersion\\DeveloperDiskImage.dmg $targetDir\\dev_image\\$productVersion\\DeveloperDiskImage.dmg.signature"
+        val proc = ProcessBuilder("ideviceimagemounter.exe", str)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process
         this@AppController.proc = proc
         val reader = proc.inputStream?.bufferedReader()
-
         while (true) {
             val line = reader!!.readLine() ?: break
             runLater {appView.appendLogs("[ideviceimagemounter] $line")}
@@ -152,11 +141,8 @@ class AppController : Controller() {
         mountDevImage()
         val timestamp = LocalDateTime.now().format(ofPattern("yyyy-MM-dd-HH-mm-ss"))
         val targetDir = System.getProperty("user.dir")
-        val path = String.format("%s\\screenshots", targetDir)
-        val argument = " $path\\screenshot-$timestamp.tiff"
-        print(argument)
-        val proc = ProcessBuilder("idevicescreenshot.exe", argument)
-        //val proc = ProcessBuilder("idevicescreenshot.exe", "$targetDir\\screenshots\\screenshot-$timestamp.png")
+        val path = "$targetDir\\screenshots\\screenshot-$timestamp.tiff"
+        val proc = ProcessBuilder("idevicescreenshot.exe", path)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process

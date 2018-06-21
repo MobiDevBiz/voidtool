@@ -3,19 +3,13 @@ package lol.kneize.idevicesyslog.gui
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
 import javafx.application.Platform
-import javafx.beans.property.SimpleStringProperty
-import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.*
-import javafx.scene.paint.Color
-import javafx.scene.paint.Paint.valueOf
 import javafx.scene.text.Font.font
 import javafx.util.Duration
 import tornadofx.*
-import lol.kneize.idevicesyslog.gui.Styles.Companion
-import sun.management.Agent.getText
 import java.util.*
 
 
@@ -28,14 +22,12 @@ class AppView : View() {
     lateinit var rPanel: Pane
     lateinit var controls: Pane
     var logsField : TextArea by singleAssign()
-
     var runButton: Button by singleAssign()
     var clearLogsButton: Button by singleAssign()
     var copyToClipboardButton: Button by singleAssign()
     var saveToFileButton: Button by singleAssign()
     var stopButton: Button by singleAssign()
     var exitButton: Button by singleAssign()
-    //var keyWordField: TextField by singleAssign()
     var keyWordField = textfield()
     var keyWord = keyWordField.text
 
@@ -47,6 +39,8 @@ class AppView : View() {
         with (root) {
             style {
                 padding = box(0.px)
+                setMinSize(800.0,600.0)
+
             }
             right {
                 rPanel = vbox(10.0) {
@@ -90,15 +84,21 @@ class AppView : View() {
                         setOnAction { appController.copyToFile() }
                     }
 
-                    button("Open logs folder") {
+                    button("Open working dir") {
                         maxWidth = Double.MAX_VALUE
-                        setOnAction { appController.openLogsFolder() }
+                        setOnAction { appController.openWorkingDir() }
                     }
 
                     button("Make screenshot") {
                         maxWidth = Double.MAX_VALUE
                         setOnAction {
                             appController.makeScreenshot()
+                        }
+                    }
+                    button("Mount dev image") {
+                        maxWidth = Double.MAX_VALUE
+                        setOnAction {
+                            appController.mountDevImage()
                         }
                     }
 
@@ -118,7 +118,10 @@ class AppView : View() {
                         vgrow = Priority.ALWAYS
                         isWrapText = false
                         isEditable = false
-                        //prefRowCount = 500000
+                        minHeight = 600.0
+                        minWidth = 800.0
+                        prefRowCount = 40
+
 //                        style {
 //                            backgroundColor += Color.DARKSLATEGRAY
 //                        }
