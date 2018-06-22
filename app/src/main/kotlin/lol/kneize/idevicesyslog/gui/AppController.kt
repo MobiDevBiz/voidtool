@@ -15,8 +15,8 @@ import java.time.format.DateTimeFormatter.ofPattern
 
 class AppController : Controller() {
     val appView: AppView by inject()
-
     var proc: Process? = null
+    private val lineDivider = System.getProperty("line.separator")
 
     
 
@@ -69,8 +69,8 @@ class AppController : Controller() {
     }
 
     fun stopCollectingLogs() {
-        this.proc = null
         this.proc?.destroy()
+        this.proc = null
         runLater { appView.appendLogs("[disconnected]" + '\n') }
 
     }
@@ -96,10 +96,10 @@ class AppController : Controller() {
         val iPad = getDeviceInfo("ProductType:")
         val iOSVersion = getDeviceInfo("ProductVersion:")
         try {
-            syslog.writeText("============================================\r\n")
-            syslog.appendText("iPad Model: $iPad\r\n")
-            syslog.appendText("iOS Version: $iOSVersion\r\n")
-            syslog.appendText("============================================\r\n")
+            syslog.writeText("============================================$lineDivider")
+            syslog.appendText("iPad Model: $iPad$lineDivider")
+            syslog.appendText("iOS Version: $iOSVersion$lineDivider")
+            syslog.appendText("============================================$lineDivider")
             syslog.appendText(appView.logsField.getText(0,appView.logsField.length).toString())
         } catch (e: IOException) {e.printStackTrace()}
         appView.appendLogs("[idevicesyslog] Stack is saved to: $syslog\n")
@@ -117,7 +117,7 @@ class AppController : Controller() {
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process
-        this@AppController.proc = proc
+        //this@AppController.proc = proc
         return proc.inputStream
                 .bufferedReader()
                 .readLines()
@@ -151,7 +151,7 @@ class AppController : Controller() {
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process
-        this@AppController.proc = proc
+        //this@AppController.proc = proc
         val reader = proc.inputStream?.bufferedReader()
         val line = reader?.readLine()
         if (line != null) {

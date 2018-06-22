@@ -1,8 +1,0 @@
-[connected]
-Jan 29 18:40:26 iPad-Pro-97-4254 lockdownd[69] <Notice>: spawn_xpc_service_block_invoke: <private>
-Jan 29 18:40:26 iPad-Pro-97-4254 lockdownd[69] <Notice>: spawn_xpc_service_block_invoke: <private>
-Jan 29 18:40:27 iPad-Pro-97-4254 wifid[43] <Notice>: WiFi:[538936827.037301]: Unable to dispatch message to client Preferences (268435460)
-Jan 29 18:40:27 iPad-Pro-97-4254 symptomsd(SymptomEvaluator)[127] <Notice>: L2 Metrics on ifname en0: rssi: -58 (txFrames/txReTx/txFail) 85/2/0 -> (was/is) 0/0
-Jan 29 18:40:27 iPad-Pro-97-4254 UserEventAgent(AppleHDQGasGauge)[21] <Notice>: determinePoSMThreshold, enabled:0 0 1 1
-Jan 29 18:40:27 iPad-Pro-97-4254 UserEventAgent(AppleHDQGasGauge)[21] <Notice>: determinePoSMThreshold, changed:0 0 0 0
-[disconnected]

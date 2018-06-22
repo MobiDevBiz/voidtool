@@ -1,3 +1,0 @@
-[connected]
-Oct 24 19:58:47 iPad-Pro-97-4254 wifid[42] <Notice>: WiFi:[530557127.508079]: Unable to dispatch message to client Preferences (268435460)
-Oct 24 19:58:47 iPad-Pro-97-4254 symptomsd(SymptomEvaluator)[155] <Notice>: L2 Metrics on ifname en0: rssi: -59 (txFrames/txReTx/txFail) 0/0/0 -> (was/is) 0/0
