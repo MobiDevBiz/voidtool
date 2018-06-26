@@ -118,45 +118,22 @@ class AppView : View() {
                         vgrow = Priority.ALWAYS
                         isWrapText = false
                         isEditable = false
-                        minHeight = 600.0
-                        minWidth = 800.0
-                        prefRowCount = 40
-
-//                        style {
-//                            backgroundColor += Color.DARKSLATEGRAY
-//                        }
                         font = font("Monospaced", 16.0)
-//                        font = font(12.0)
-
-
-
                     }
                 }
             }
 
             Platform.runLater {
                 currentStage?.minHeight = rPanel.height + Styles.APP_PADDING * 2
+                currentStage?.minWidth = rPanel.height * 2 + Styles.APP_PADDING * 2
             }
         }
     }
-//    fun deleteLogs(index: Int) {
-//        val LIMIT = 500000
-//        logsField.replaceText()
-//    }
+
 
     fun appendLogs(logs: String) {
-//        val pos = logsField.getScrollTop()
-//        val anchor = logsField.getAnchor()
-//        val caret = logsField.getCaretPosition()
-//        if (logs.contains("JustEnergy", ignoreCase = true))
-//        {
-//            logs.toString()
-//        }
-
         logsField.appendText(logs)
 
-//        logsField.setScrollTop(pos)
-//        logsField.selectRange(anchor, caret)
     }
 
     fun shakeStage() {
