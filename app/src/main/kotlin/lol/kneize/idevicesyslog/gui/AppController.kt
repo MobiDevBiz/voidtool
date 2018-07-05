@@ -162,7 +162,7 @@ class AppController : Controller() {
     fun mountDevImage() {
         val productVersion = getDeviceInfo("ProductVersion")
         val targetDir = System.getProperty("user.dir")
-        val str = "$targetDir\\dev_image\\$productVersion\\DeveloperDiskImage.dmg $targetDir\\dev_image\\$productVersion\\DeveloperDiskImage.dmg.signature"
+        val str = "$targetDir${File.separator}dev_image${File.separator}$productVersion${File.separator}DeveloperDiskImage.dmg $targetDir${File.separator}dev_image${File.separator}$productVersion${File.separator}DeveloperDiskImage.dmg.signature"
         val proc = ProcessBuilder(OS.getActions().executable("ideviceimagemounter"), str)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
@@ -179,7 +179,7 @@ class AppController : Controller() {
         mountDevImage()
         val timestamp = LocalDateTime.now().format(ofPattern("yyyy-MM-dd-HH-mm-ss"))
         val targetDir = System.getProperty("user.dir")
-        val path = "$targetDir\\screenshots\\screenshot-$timestamp.tiff"
+        val path = "$targetDir${File.separator}screenshots${File.separator}screenshot-$timestamp.tiff"
         val proc = ProcessBuilder(OS.getActions().executable("idevicescreenshot"), path)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
