@@ -3,20 +3,23 @@ package lol.kneize.idevicesyslog.gui
 import javafx.application.Platform
 import javafx.scene.input.Clipboard
 import javafx.scene.input.ClipboardContent
-import tornadofx.*
+import lol.kneize.idevicesyslog.gui.OS.OS
+import tornadofx.Controller
+import tornadofx.FX
+import tornadofx.runLater
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 import java.io.IOException
-import lol.kneize.idevicesyslog.gui.WindowsActions.openDirectoryViewer
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter.ofPattern
+import java.util.*
 
 
 class AppController : Controller() {
     val appView: AppView by inject()
     var proc: Process? = null
     private val lineDivider = System.getProperty("line.separator")
+
 
     
 
@@ -41,7 +44,7 @@ class AppController : Controller() {
 
     fun startCollectingLogs() {
         runAsync {
-            val proc = ProcessBuilder("idevicesyslog.exe")
+            val proc = ProcessBuilder(OS.getActions().executable("idevicesyslog"))
                     .redirectOutput(ProcessBuilder.Redirect.PIPE)
                     .redirectError(ProcessBuilder.Redirect.PIPE)
                     .start() as Process
@@ -58,7 +61,37 @@ class AppController : Controller() {
                         runLater { System.gc() }
                     } else if (appView.keyWord.isNotEmpty() && line.contains(appView.keyWord, ignoreCase = true)) {
                         switch = !switch
+
                         runLater { appView.appendLogs(line + '\n') }
+                        runLater { System.gc() }
+                    }
+                } else if (!line.matches(applicationMessageRegex) && switch) {
+                    runLater { appView.appendLogs(line + '\n') }
+                }
+            }
+        }
+    }
+
+    fun startAppendingRows() {
+        runAsync {
+            val proc = ProcessBuilder(OS.getActions().executable(OS.getActions().executable("idevicesyslog")))
+                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                    .redirectError(ProcessBuilder.Redirect.PIPE)
+                    .start() as Process
+            this@AppController.proc = proc
+            val reader = proc.inputStream.bufferedReader()
+            var switch = false
+            while (true) {
+                val line = reader.readLine() ?: break
+                if (line.matches(serviceMessageRegex) || line.matches(applicationMessageRegex)) {
+                    runLater { appView.logMessage.add(line+'\n') }
+                } else if (line.matches(syslogMessageRegex)) {
+                    if (appView.keyWord.isEmpty()) {
+                        runLater { appView.logMessage.add(line+'\n') }
+                        runLater { System.gc() }
+                    } else if (appView.keyWord.isNotEmpty() && line.contains(appView.keyWord, ignoreCase = true)) {
+                        switch = !switch
+                        runLater { appView.logMessage.add(line+'\n') }
                         runLater { System.gc() }
                     }
                 } else if (!line.matches(applicationMessageRegex) && switch) {
@@ -108,12 +141,12 @@ class AppController : Controller() {
     fun openWorkingDir(){
         val targetDir = System.getProperty("user.dir")
         val root = File(targetDir)
-        openDirectoryViewer(root)
+        OS.getActions().openDirectoryViewer(root)
         appView.appendLogs("[idevicesyslog] Opened folder: $targetDir\n")
     }
 
     private fun getDeviceInfo(property: String): String {
-        val proc = ProcessBuilder("ideviceinfo.exe")
+        val proc = ProcessBuilder(OS.getActions().executable("ideviceinfo"))
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process
@@ -130,7 +163,7 @@ class AppController : Controller() {
         val productVersion = getDeviceInfo("ProductVersion")
         val targetDir = System.getProperty("user.dir")
         val str = "$targetDir\\dev_image\\$productVersion\\DeveloperDiskImage.dmg $targetDir\\dev_image\\$productVersion\\DeveloperDiskImage.dmg.signature"
-        val proc = ProcessBuilder("ideviceimagemounter.exe", str)
+        val proc = ProcessBuilder(OS.getActions().executable("ideviceimagemounter"), str)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process
@@ -147,7 +180,7 @@ class AppController : Controller() {
         val timestamp = LocalDateTime.now().format(ofPattern("yyyy-MM-dd-HH-mm-ss"))
         val targetDir = System.getProperty("user.dir")
         val path = "$targetDir\\screenshots\\screenshot-$timestamp.tiff"
-        val proc = ProcessBuilder("idevicescreenshot.exe", path)
+        val proc = ProcessBuilder(OS.getActions().executable("idevicescreenshot"), path)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process
@@ -169,3 +202,4 @@ class AppController : Controller() {
         Platform.exit()
     }
 }
+

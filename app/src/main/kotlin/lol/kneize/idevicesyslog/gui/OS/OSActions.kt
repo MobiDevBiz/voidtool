@@ -1,4 +1,4 @@
-package lol.kneize.idevicesyslog.gui
+package lol.kneize.idevicesyslog.gui.OS
 
 import java.io.IOException
 import java.io.File
