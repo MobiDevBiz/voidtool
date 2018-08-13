@@ -7,6 +7,7 @@ import lol.kneize.idevicesyslog.gui.OS.OS
 import tornadofx.Controller
 import tornadofx.FX
 import tornadofx.runLater
+import tornadofx.tableview
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -41,9 +42,21 @@ class AppController : Controller() {
     private val syslogMessageRegex = Regex("""^(\w{3})\s+\d+\s\d+:\d+:\d+\s+[\w-\d]+\s.*?:\s(.*)$""")
     private val applicationMessageRegex = Regex("""^\[(\w)+:\d+]\s*(.*)""")
     private val devicePropertyRegex = Regex("""^(\w+:\s)(.*)$""")
+    private val syslogMessageDate = Regex("""""")
+    private val syslogMessageDeviceName = Regex("""""")
+    private val syslogMessageParentProcess = Regex("""""")
+    private val syslogMessageLogLevel= Regex("""""")
+    private val syslogMessageMessage= Regex("""""")
 
-    fun startCollectingLogs() {
+
+    fun parseMessage(input: String): LogMessage = LogMessage(input, "", "", "", "")
+
+    fun startAppendingRows() {
         runAsync {
+            fun appendMessage(line: String) = runLater {
+                appView.observableList.add(parseMessage(line))
+            }
+
             val proc = ProcessBuilder(OS.getActions().executable("idevicesyslog"))
                     .redirectOutput(ProcessBuilder.Redirect.PIPE)
                     .redirectError(ProcessBuilder.Redirect.PIPE)
@@ -54,48 +67,18 @@ class AppController : Controller() {
             while (true) {
                 val line = reader.readLine() ?: break
                 if (line.matches(serviceMessageRegex) || line.matches(applicationMessageRegex)) {
-                    runLater { appView.appendLogs(line + '\n') }
+                    appendMessage(line)
                 } else if (line.matches(syslogMessageRegex)) {
-                    if (appView.keyWord.isEmpty()) {
-                        runLater { appView.appendLogs(line + '\n') }
+                    /*if (appView.keyword.isEmpty.isValid) {
+                        appendMessage(line)
                         runLater { System.gc() }
-                    } else if (appView.keyWord.isNotEmpty() && line.contains(appView.keyWord, ignoreCase = true)) {
+                    } else if (appView.keyword.isNotEmpty().isValid && line.contains(appView.keyword.value, ignoreCase = true)) {*/
                         switch = !switch
-
-                        runLater { appView.appendLogs(line + '\n') }
-                        runLater { System.gc() }
-                    }
+                        appendMessage(line)
+                        //runLater { System.gc() }
+                    //}
                 } else if (!line.matches(applicationMessageRegex) && switch) {
-                    runLater { appView.appendLogs(line + '\n') }
-                }
-            }
-        }
-    }
-
-    fun startAppendingRows() {
-        runAsync {
-            val proc = ProcessBuilder(OS.getActions().executable(OS.getActions().executable("idevicesyslog")))
-                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                    .redirectError(ProcessBuilder.Redirect.PIPE)
-                    .start() as Process
-            this@AppController.proc = proc
-            val reader = proc.inputStream.bufferedReader()
-            var switch = false
-            while (true) {
-                val line = reader.readLine() ?: break
-                if (line.matches(serviceMessageRegex) || line.matches(applicationMessageRegex)) {
-                    runLater { appView.logMessage.add(line+'\n') }
-                } else if (line.matches(syslogMessageRegex)) {
-                    if (appView.keyWord.isEmpty()) {
-                        runLater { appView.logMessage.add(line+'\n') }
-                        runLater { System.gc() }
-                    } else if (appView.keyWord.isNotEmpty() && line.contains(appView.keyWord, ignoreCase = true)) {
-                        switch = !switch
-                        runLater { appView.logMessage.add(line+'\n') }
-                        runLater { System.gc() }
-                    }
-                } else if (!line.matches(applicationMessageRegex) && switch) {
-                    runLater { appView.appendLogs(line + '\n') }
+                    //runLater { appView.appendLogs(line + '\n') }
                 }
             }
         }
@@ -104,19 +87,19 @@ class AppController : Controller() {
     fun stopCollectingLogs() {
         this.proc?.destroy()
         this.proc = null
-        runLater { appView.appendLogs("[disconnected]" + '\n') }
+        runLater { appView.observableList.add(LogMessage("","","","","[disconnected]" + '\n'))}
 
     }
 
     fun copyToClipboard() {
-        val clipboard = Clipboard.getSystemClipboard()
+        /*val clipboard = Clipboard.getSystemClipboard()
         val content = ClipboardContent()
         val selection = appView.logsField.selectedText
         if (selection.isNotEmpty()) {
             content.putString(selection.toString())
             clipboard.setContent(content)
-            appView.appendLogs("[idevicesyslog] Selection is saved to clipboard" + '\n')
-        }
+            appView.observableList.add(LogMessage("","","","","[idevicesyslog] Selection is saved to clipboard"))
+        }*/
     }
 
     fun copyToFile() {
@@ -133,16 +116,17 @@ class AppController : Controller() {
             syslog.appendText("iPad Model: $iPad$lineDivider")
             syslog.appendText("iOS Version: $iOSVersion$lineDivider")
             syslog.appendText("============================================$lineDivider")
-            syslog.appendText(appView.logsField.getText(0,appView.logsField.length).toString())
+            syslog.appendText(appView.filteredList.toString())
+            //syslog.appendText(appView.logsField.getText(0,appView.logsField.length).toString())
         } catch (e: IOException) {e.printStackTrace()}
-        appView.appendLogs("[idevicesyslog] Stack is saved to: $syslog\n")
+        appView.observableList.add(LogMessage("","","","","[idevicesyslog] Stack is saved to: $syslog"))
     }
 
     fun openWorkingDir(){
         val targetDir = System.getProperty("user.dir")
         val root = File(targetDir)
         OS.getActions().openDirectoryViewer(root)
-        appView.appendLogs("[idevicesyslog] Opened folder: $targetDir\n")
+        appView.observableList.add(LogMessage("","","","","[idevicesyslog] Opened folder: $targetDir"))
     }
 
     private fun getDeviceInfo(property: String): String {
@@ -150,7 +134,6 @@ class AppController : Controller() {
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process
-        //this@AppController.proc = proc
         return proc.inputStream
                 .bufferedReader()
                 .readLines()
@@ -171,7 +154,7 @@ class AppController : Controller() {
         val reader = proc.inputStream?.bufferedReader()
         while (true) {
             val line = reader!!.readLine() ?: break
-            runLater {appView.appendLogs("[ideviceimagemounter] $line")}
+            runLater {appView.observableList.add(LogMessage("","","","","[ideviceimagemounter] $line"))}
         }
     }
 
@@ -188,13 +171,14 @@ class AppController : Controller() {
         val reader = proc.inputStream?.bufferedReader()
         val line = reader?.readLine()
         if (line != null) {
-            appView.appendLogs("[idevicescreenshot] $line\n")
+            //appView.appendLogs("[idevicescreenshot] $line\n")
         }
     }
 
     fun clearLogs() {
-        appView.logsField.clear()
-        appView.appendLogs("[idevicesyslog] view is cleared" + '\n')
+        //appView.logsField.clear()
+        //appView.appendLogs("[idevicesyslog] view is cleared" + '\n')
+        appView.observableList.add(LogMessage("","","","","[idevicesyslog] view is cleared"))
     }
 
     fun exit() {
@@ -202,4 +186,5 @@ class AppController : Controller() {
         Platform.exit()
     }
 }
+
 
