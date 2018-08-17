@@ -1,6 +1,6 @@
 package lol.kneize.idevicesyslog.gui
 
-class LogMessage(
+data class LogMessage(
         val logdate: String,
         val deviceName: String,
         val parentProcess: String,

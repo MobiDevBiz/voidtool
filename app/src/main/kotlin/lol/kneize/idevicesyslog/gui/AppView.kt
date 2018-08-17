@@ -29,6 +29,8 @@ class AppView : View() {
 
     lateinit var rPanel: Pane
     lateinit var controls: Pane
+    lateinit var logView: TableView<*>
+    lateinit var keyword: TextField
 
 /*
 val fooProperty = SimpleStringProperty()  // Or any other Property
@@ -54,7 +56,7 @@ var foo by fooProperty
                 rPanel = vbox(10.0) {
                     padding = tornadofx.insets(10.0)
                     alignment = Pos.CENTER_RIGHT
-                    textfield {
+                    keyword = textfield {
                         promptText = "Filter"
                         textProperty().addListener { _: ObservableValue<*>, _: String, newValue: String ->
                             if(newValue.isEmpty()) {
@@ -65,10 +67,6 @@ var foo by fooProperty
                         }
                     }
 
-//                    checkbox("Autoscroll", scroll ){
-//                        maxWidth = Double.MAX_VALUE
-//
-//                    }
 
                     button("Run") {
                         isDefaultButton = true
@@ -116,12 +114,14 @@ var foo by fooProperty
                     padding = tornadofx.insets(10f)
                     maxHeight = Double.MAX_VALUE
 
-                    var logview = tableview<LogMessage>(filteredList) {
+                    logView = tableview<LogMessage>(filteredList) {
                         readonlyColumn("Date", LogMessage::logdate)
                         readonlyColumn("Device Name", LogMessage::deviceName)
                         readonlyColumn("Parent process", LogMessage::parentProcess)
                         readonlyColumn("Log level", LogMessage::logLevel)
                         readonlyColumn("Message", LogMessage::message)
+                        prefHeightProperty().bind(currentStage?.heightProperty())
+                        prefWidthProperty().bind(currentStage?.widthProperty())
 
                         columnResizePolicy = CONSTRAINED_RESIZE_POLICY
                         font("Monospaced", 16.0)
@@ -146,9 +146,6 @@ var foo by fooProperty
         }
     }
 
-    /*fun appendRows(row: LogMessage<String>){
-        logMessage.add(0, row)
-    }*/
 
     fun shakeStage() {
         val rand = Random()
