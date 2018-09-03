@@ -1,6 +1,8 @@
 package lol.kneize.idevicesyslog.gui
 
 import javafx.application.Platform
+import javafx.scene.input.Clipboard
+import javafx.scene.input.ClipboardContent
 import lol.kneize.idevicesyslog.gui.OS.OS
 import org.intellij.lang.annotations.Language
 import tornadofx.*
@@ -39,7 +41,7 @@ class AppController : Controller() {
     private val applicationMessageRegex = Regex("""^\[(\w)+:\d+]\s*(.*)""")
     private val devicePropertyRegex = Regex("""^(\w+:\s)(.*)$""")
 
-    @Language("RegExp") private val syslogDate = """\w{3}\s\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2}"""
+    @Language("RegExp") private val syslogDate = """\w{3}\s+\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2}"""
     @Language("RegExp") private val syslogDeviceName = """.*?"""
     @Language("RegExp") private val syslogParentProcess = """[\w()]+\[\d+]"""
     @Language("RegExp") private val syslogLogLevel = """<\w+>"""
@@ -52,10 +54,9 @@ class AppController : Controller() {
                     "($syslogMessageText)")
 
 
-    fun parseMessage(input: String): LogMessage? {
+    private fun parseMessage(input: String): LogMessage? {
         val match = syslogMessage.matchEntire(input)
         return match?.let {
-            println("+++++ $input")
             LogMessage(
                     it.groupValues[1],
                     it.groupValues[2],
@@ -63,8 +64,6 @@ class AppController : Controller() {
                     it.groupValues[4],
                     it.groupValues[5])
         } ?: run {
-            println("----- $input")
-            //println("Regex: ${syslogMessage.pattern}")
             null
         }
     }
@@ -120,50 +119,49 @@ class AppController : Controller() {
         this.proc = null
         appendMessage()
         appendMessage("[disconnected]")
-        //runLater { appView.observableList.add(LogMessage("","","","","[disconnected]" + '\n'))}
-
     }
 
     fun copyToClipboard() {
-        /*val clipboard = Clipboard.getSystemClipboard()
-        val content = ClipboardContent()
-        val selection = appView.logsField.selectedText
+        val clipboard = Clipboard.getSystemClipboard()
+        val clipboardContent = ClipboardContent()
+        val selection = appView.logView.selectedItem.toString()
+        //val selectionContent = selection[0].split("(")[1] + lineDivider + selection[1] + lineDivider + selection[2] + lineDivider + selection[3] + lineDivider + selection[4].dropLast(1)
         if (selection.isNotEmpty()) {
-            content.putString(selection.toString())
-            clipboard.setContent(content)
-            appView.observableList.add(LogMessage("","","","","[idevicesyslog] Selection is saved to clipboard"))
-        }*/
+            clipboardContent.putString(selection)
+            clipboard.setContent(clipboardContent)
+            appendMessage("[idevicesyslog] Selection is copied to clipboard")
+        }
     }
 
     fun copyToFile() {
         val targetDir = System.getProperty("user.dir")
-        val path = String.format("%s/logs", targetDir)
+        val path = String.format("$targetDir${File.separator}logs")
         val root = File(path)
         root.mkdirs()
         val fileName = "syslog-" + SimpleDateFormat("yyyy-MM-dd-hh-mm-ss").format(Date()) + ".txt"
         val syslog = File(root, fileName)
         val iPad = getDeviceInfo("ProductType:")
         val iOSVersion = getDeviceInfo("ProductVersion:")
+        val uniqueDeviceID = getDeviceInfo("UniqueDeviceID:")
         try {
-            syslog.writeText("============================================$lineDivider")
+            syslog.writeText("===============================================================================$lineDivider")
             syslog.appendText("Apple Device Model: $iPad$lineDivider")
             syslog.appendText("iOS Version: $iOSVersion$lineDivider")
+            syslog.appendText("UDID: $uniqueDeviceID$lineDivider")
             syslog.appendText("Search term was: " + appView.keyword.text + lineDivider)
-            syslog.appendText("============================================$lineDivider")
+            syslog.appendText("================================================================================$lineDivider")
             for (i in appView.filteredList ) {
                 syslog.appendText(i.logdate + i.deviceName + i.parentProcess + i.logLevel + i.message + lineDivider)
             }
-            //syslog.appendText(appView.logView.selectionModel.selectedCells.)
-            //syslog.appendText(appView.logsField.getText(0,appView.logsField.length).toString())
         } catch (e: IOException) {e.printStackTrace()}
-        appView.observableList.add(LogMessage("","","","","[idevicesyslog] Stack is saved to: $syslog"))
+            appendMessage("[idevicesyslog] Stack is saved to: $syslog")
     }
 
     fun openWorkingDir(){
         val targetDir = System.getProperty("user.dir")
         val root = File(targetDir)
         OS.getActions().openDirectoryViewer(root)
-        appView.observableList.add(LogMessage("","","","","[idevicesyslog] Opened folder: $targetDir"))
+        appendMessage("[idevicesyslog] Opened folder: $targetDir")
     }
 
     private fun getDeviceInfo(property: String): String {
@@ -191,7 +189,7 @@ class AppController : Controller() {
         val reader = proc.inputStream?.bufferedReader()
         while (true) {
             val line = reader!!.readLine() ?: break
-            runLater {appView.observableList.add(LogMessage("","","","","[ideviceimagemounter] $line"))}
+            appendMessage("[ideviceimagemounter] $line")
         }
     }
 
@@ -204,11 +202,10 @@ class AppController : Controller() {
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process
-        //this@AppController.proc = proc
         val reader = proc.inputStream?.bufferedReader()
         val line = reader?.readLine()
         if (line != null) {
-            //appView.appendLogs("[idevicescreenshot] $line\n")
+            appendMessage("[idevicescreenshot] $line")
         }
     }
 

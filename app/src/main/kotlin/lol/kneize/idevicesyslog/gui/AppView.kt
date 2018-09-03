@@ -1,3 +1,5 @@
+@file:Suppress("NAME_SHADOWING")
+
 package lol.kneize.idevicesyslog.gui
 
 import javafx.animation.KeyFrame
@@ -14,13 +16,14 @@ import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.*
-import javafx.scene.text.Font.font
 import javafx.util.Duration
 import tornadofx.*
 import java.util.*
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
 import javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY
+import javafx.scene.paint.Color
+import javafx.scene.text.Font.font
 import java.util.ArrayList
 
 class AppView : View() {
@@ -79,14 +82,11 @@ var foo by fooProperty
                         maxWidth = Double.MAX_VALUE
                         setOnAction {appController.stopCollectingLogs()}
                     }
-//                    button("Clear logs") {
-//                        maxWidth = Double.MAX_VALUE
-//                        setOnAction { appController.clearLogs() }
-//                    }
-//                    button("To clipboard") {
-//                        maxWidth = Double.MAX_VALUE
-//                        setOnAction { appController.copyToClipboard() }
-//                    }
+
+                    button("To clipboard") {
+                        maxWidth = Double.MAX_VALUE
+                        setOnAction { appController.copyToClipboard() }
+                    }
                     button("To File") {
                         maxWidth = Double.MAX_VALUE
                         setOnAction { appController.copyToFile() }
@@ -118,13 +118,24 @@ var foo by fooProperty
                         readonlyColumn("Date", LogMessage::logdate)
                         readonlyColumn("Device Name", LogMessage::deviceName)
                         readonlyColumn("Parent process", LogMessage::parentProcess)
-                        readonlyColumn("Log level", LogMessage::logLevel)
+                        readonlyColumn("Log level", LogMessage::logLevel)/*.cellFormat {
+                            if(rowItem.logLevel == "<Notice>") {
+                                style {
+                                    backgroundColor += Color.ALICEBLUE
+                                    textFill = Color.BLACK
+                                    text = it
+                                }
+                            }
+                        }*/
                         readonlyColumn("Message", LogMessage::message)
                         prefHeightProperty().bind(currentStage?.heightProperty())
                         prefWidthProperty().bind(currentStage?.widthProperty())
 
-                        columnResizePolicy = CONSTRAINED_RESIZE_POLICY
-                        font("Monospaced", 16.0)
+                        style {
+                            fontFamily = "Monospaced"
+                        }
+
+                        columnResizePolicy = SmartResize.POLICY
                         if (scroll.value) {
                             items.addListener { c: ListChangeListener.Change<*> ->
                                 c.next()
