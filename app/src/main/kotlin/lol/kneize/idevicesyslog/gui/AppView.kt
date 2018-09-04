@@ -5,10 +5,7 @@ package lol.kneize.idevicesyslog.gui
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
 import javafx.application.Platform
-import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleSetProperty
-import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
@@ -21,10 +18,7 @@ import tornadofx.*
 import java.util.*
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
-import javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY
 import javafx.scene.paint.Color
-import javafx.scene.text.Font.font
-import java.util.ArrayList
 
 class AppView : View() {
     override val root = BorderPane()
@@ -32,7 +26,7 @@ class AppView : View() {
 
     lateinit var rPanel: Pane
     lateinit var controls: Pane
-    lateinit var logView: TableView<*>
+    lateinit var logView: TableView<LogMessage>
     lateinit var keyword: TextField
 
 /*
@@ -115,19 +109,11 @@ var foo by fooProperty
                     maxHeight = Double.MAX_VALUE
 
                     logView = tableview<LogMessage>(filteredList) {
-                        readonlyColumn("Date", LogMessage::logdate)
-                        readonlyColumn("Device Name", LogMessage::deviceName)
-                        readonlyColumn("Parent process", LogMessage::parentProcess)
-                        readonlyColumn("Log level", LogMessage::logLevel)/*.cellFormat {
-                            if(rowItem.logLevel == "<Notice>") {
-                                style {
-                                    backgroundColor += Color.ALICEBLUE
-                                    textFill = Color.BLACK
-                                    text = it
-                                }
-                            }
-                        }*/
-                        readonlyColumn("Message", LogMessage::message)
+                        readonlyColumn("Date", LogMessage::logDate).cellFormat(cellFormatter)
+                        readonlyColumn("Device Name", LogMessage::deviceName).cellFormat(cellFormatter)
+                        readonlyColumn("Parent process", LogMessage::parentProcess).cellFormat(cellFormatter)
+                        readonlyColumn("Log level", LogMessage::logLevelString).cellFormat(cellFormatter)
+                        readonlyColumn("Message", LogMessage::message).cellFormat(cellFormatter)
                         prefHeightProperty().bind(currentStage?.heightProperty())
                         prefWidthProperty().bind(currentStage?.widthProperty())
 
@@ -157,7 +143,6 @@ var foo by fooProperty
         }
     }
 
-
     fun shakeStage() {
         val rand = Random()
         var dir = false
@@ -186,3 +171,30 @@ var foo by fooProperty
     }
 }
 
+private val cellFormatter: TableCell<LogMessage, String>.(String) -> Unit = {
+    style(append = true) {
+        focusColor = Color.RED
+        accentColor = Color.RED
+//        borderColor += box(
+//                top = Color.DARKCYAN,
+//                bottom = Color.DARKCYAN
+//        )
+        backgroundColor += when(rowItem.logLevel) {
+            LogLevel.EMERGENCY -> Color.RED
+            LogLevel.ALERT -> Color.ORANGERED
+            LogLevel.CRITICAL -> Color.SALMON
+            LogLevel.ERROR -> Color.PINK
+            LogLevel.WARNING -> Color.PALEGOLDENROD
+            LogLevel.NOTICE -> Color.WHITESMOKE
+            LogLevel.INFO -> Color.WHITESMOKE
+            LogLevel.DEBUG -> Color.WHITESMOKE
+            LogLevel.UNKNOWN -> Color.TRANSPARENT
+        }
+
+        textFill = Color.BLACK
+        text = item
+
+
+        highlightTextFill = Color.WHITE
+    }
+}

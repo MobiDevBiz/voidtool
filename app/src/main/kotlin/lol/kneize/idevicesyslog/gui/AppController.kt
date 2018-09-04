@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter.ofPattern
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class AppController : Controller() {
@@ -43,7 +44,7 @@ class AppController : Controller() {
 
     @Language("RegExp") private val syslogDate = """\w{3}\s+\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2}"""
     @Language("RegExp") private val syslogDeviceName = """.*?"""
-    @Language("RegExp") private val syslogParentProcess = """[\w()]+\[\d+]"""
+    @Language("RegExp") private val syslogParentProcess = """.+(?:\(.+\))?\[\d+]"""
     @Language("RegExp") private val syslogLogLevel = """<\w+>"""
     @Language("RegExp") private val syslogMessageText = """.*"""
     private val syslogMessage = Regex(
@@ -115,7 +116,8 @@ class AppController : Controller() {
     }
 
     fun stopCollectingLogs() {
-        this.proc?.destroy()
+        this.proc?.destroyForcibly()
+        this.proc?.waitFor(5000, TimeUnit.MILLISECONDS)
         this.proc = null
         appendMessage()
         appendMessage("[disconnected]")
@@ -124,9 +126,8 @@ class AppController : Controller() {
     fun copyToClipboard() {
         val clipboard = Clipboard.getSystemClipboard()
         val clipboardContent = ClipboardContent()
-        val selection = appView.logView.selectedItem.toString()
-        //val selectionContent = selection[0].split("(")[1] + lineDivider + selection[1] + lineDivider + selection[2] + lineDivider + selection[3] + lineDivider + selection[4].dropLast(1)
-        if (selection.isNotEmpty()) {
+        val selection = appView.logView.selectedItem?.toDetailedString()
+        if (!selection.isNullOrBlank()) {
             clipboardContent.putString(selection)
             clipboard.setContent(clipboardContent)
             appendMessage("[idevicesyslog] Selection is copied to clipboard")
@@ -144,17 +145,22 @@ class AppController : Controller() {
         val iOSVersion = getDeviceInfo("ProductVersion:")
         val uniqueDeviceID = getDeviceInfo("UniqueDeviceID:")
         try {
-            syslog.writeText("===============================================================================$lineDivider")
-            syslog.appendText("Apple Device Model: $iPad$lineDivider")
-            syslog.appendText("iOS Version: $iOSVersion$lineDivider")
-            syslog.appendText("UDID: $uniqueDeviceID$lineDivider")
-            syslog.appendText("Search term was: " + appView.keyword.text + lineDivider)
-            syslog.appendText("================================================================================$lineDivider")
-            for (i in appView.filteredList ) {
-                syslog.appendText(i.logdate + i.deviceName + i.parentProcess + i.logLevel + i.message + lineDivider)
+            syslog.bufferedWriter().use {
+                it.append("===============================================================================$lineDivider")
+                it.append("Apple Device Model: $iPad$lineDivider")
+                it.append("iOS Version: $iOSVersion$lineDivider")
+                it.append("UDID: $uniqueDeviceID$lineDivider")
+                it.append("Search term was: " + appView.keyword.text + lineDivider)
+                it.append("================================================================================$lineDivider")
+                for (i in appView.observableList) {
+                    it.append(i.toString())
+                    it.append(lineDivider)
+                }
             }
-        } catch (e: IOException) {e.printStackTrace()}
-            appendMessage("[idevicesyslog] Stack is saved to: $syslog")
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        appendMessage("[idevicesyslog] Stack is saved to: $syslog")
     }
 
     fun openWorkingDir(){
