@@ -1,9 +1,9 @@
-package lol.kneize.idevicesyslog.gui.OS
+package lol.kneize.idevicesyslog.gui.os
 
 import java.io.IOException
 import java.io.File
 
-class  WindowsActions : OSActions {
+class WindowsActions : OSActions {
     override fun getDesktopPath(value: String): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

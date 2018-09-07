@@ -1,8 +1,7 @@
-package lol.kneize.idevicesyslog.gui.OS
+package lol.kneize.idevicesyslog.gui.os
 
 import java.io.IOException
 import java.io.File
-
 
 class OSXActions : OSActions {
     override fun getDesktopPath(value: String): String {

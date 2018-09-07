@@ -3,7 +3,7 @@ package lol.kneize.idevicesyslog.gui
 import javafx.application.Platform
 import javafx.scene.input.Clipboard
 import javafx.scene.input.ClipboardContent
-import lol.kneize.idevicesyslog.gui.OS.OS
+import lol.kneize.idevicesyslog.gui.os.OS
 import org.intellij.lang.annotations.Language
 import tornadofx.*
 import java.io.File

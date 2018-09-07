@@ -1,13 +1,11 @@
-package lol.kneize.idevicesyslog.gui.OS
+package lol.kneize.idevicesyslog.gui.os
 
-enum class OS private constructor(private val actions: OSActions) {
+enum class OS constructor(private val actions: OSActions) {
     WINDOWS(WindowsActions()),
     LINUX(LinuxActions()),
     MACOSX(OSXActions());
 
-
     companion object {
-
         val current: OS
             get() {
                 val os = System.getProperty("os.name")

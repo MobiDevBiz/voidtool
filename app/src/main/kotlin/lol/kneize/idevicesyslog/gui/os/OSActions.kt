@@ -1,8 +1,7 @@
-package lol.kneize.idevicesyslog.gui.OS
+package lol.kneize.idevicesyslog.gui.os
 
 import java.io.IOException
 import java.io.File
-
 
 interface OSActions {
     val desktopPath: String

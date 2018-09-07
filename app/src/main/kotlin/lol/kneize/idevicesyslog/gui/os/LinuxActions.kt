@@ -1,14 +1,12 @@
-package lol.kneize.idevicesyslog.gui.OS
+package lol.kneize.idevicesyslog.gui.os
 
 import java.io.IOException
 import java.io.File
-
 
 class LinuxActions : OSActions {
     override fun getDesktopPath(value: String): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
 
     override val desktopPath: String
         get() {
