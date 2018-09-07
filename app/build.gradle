@@ -6,18 +6,18 @@ plugins {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile 'no.tornado:tornadofx:1.7.16'
+    compile 'no.tornado:tornadofx:1.7.17'
 }
 
-mainClassName = 'lol.kneize.idevicesyslog.gui.AppModel'
+mainClassName = 'lol.kneize.idevicesyslog.gui.AppModelKt'
 
-sourceCompatibility = 9
-targetCompatibility = 9
+sourceCompatibility = 8
+targetCompatibility = 8
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions.jvmTarget = '1.8'
 }
 
-shadowJar{
+shadowJar {
     baseName = 'idevicesyslog-gui'
 }

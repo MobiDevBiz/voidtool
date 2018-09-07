@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.51'
+    ext.kotlin_version = '1.2.60'
 
     repositories {
         jcenter()
@@ -10,7 +10,7 @@ buildscript {
 }
 
 plugins {
-	id 'com.github.johnrengelman.shadow' version '2.0.1' apply false
+	id 'com.github.johnrengelman.shadow' version '2.0.4' apply false
 }
 
 allprojects {
@@ -22,5 +22,4 @@ subprojects {
     repositories {
         jcenter()
     }
-
 }
