@@ -7,13 +7,13 @@ import tornadofx.px
 
 class Styles : Stylesheet() {
     companion object {
-        val APP_PADDING = 15.0
+        const val APP_PADDING = 15.0
 
-        val appview by cssclass()
+        val appView by cssclass()
     }
 
     init {
-        select(appview) {
+        select(appView) {
             padding = box(APP_PADDING.px)
             vgap = 14.px
             hgap = 20.px

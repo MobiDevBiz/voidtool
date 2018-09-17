@@ -15,7 +15,7 @@ class LinuxActions : OSActions {
                         .start()
                 val lines = proc.inputStream.bufferedReader().readLines()
                 if (!lines.isEmpty()) {
-                    return lines.get(0)
+                    return lines[0]
                 }
             } catch (e: IOException) {
             }

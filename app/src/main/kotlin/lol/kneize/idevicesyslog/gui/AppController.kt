@@ -16,26 +16,10 @@ import java.util.concurrent.TimeUnit
 
 
 class AppController : Controller() {
-    val appView: AppView by inject()
-    var proc: Process? = null
+    private val appView: AppView by inject()
+    private var proc: Process? = null
     private val lineDivider = System.getProperty("line.separator")
 
-
-    
-
-    fun showLoginScreen(message: String, shake: Boolean = false) {
-        if (FX.primaryStage.scene.root != appView.root) {
-            FX.primaryStage.scene.root = appView.root
-            FX.primaryStage.sizeToScene()
-            FX.primaryStage.centerOnScreen()
-        }
-
-        appView.title = message
-
-        Platform.runLater {
-            if (shake) appView.shakeStage()
-        }
-    }
 
     private val serviceMessageRegex = Regex("""^\[\w+]""")
     private val syslogMessageRegex = Regex("""^(\w{3})\s+\d+\s\d+:\d+:\d+\s+[\w-\d]+\s.*?:\s(.*)$""")
@@ -203,8 +187,11 @@ class AppController : Controller() {
         mountDevImage()
         val timestamp = LocalDateTime.now().format(ofPattern("yyyy-MM-dd-HH-mm-ss"))
         val targetDir = System.getProperty("user.dir")
-        val path = "$targetDir${File.separator}screenshots${File.separator}screenshot-$timestamp.tiff"
-        val proc = ProcessBuilder(OS.getActions().executable("idevicescreenshot"), path)
+        val path = String.format("$targetDir${File.separator}screenshots")
+        val root = File(path)
+        root.mkdirs()
+        val pathToSaveScreenshot = "$targetDir${File.separator}screenshots${File.separator}screenshot-$timestamp.tiff"
+        val proc = ProcessBuilder(OS.getActions().executable("idevicescreenshot"), pathToSaveScreenshot)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() as Process

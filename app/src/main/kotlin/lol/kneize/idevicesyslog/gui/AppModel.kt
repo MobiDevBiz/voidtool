@@ -6,7 +6,6 @@ import tornadofx.App
 import tornadofx.importStylesheet
 
 class AppModel : App(AppView::class) {
-    val appController: AppController by inject()
 
     override fun start(stage: Stage) {
         importStylesheet(Styles::class)

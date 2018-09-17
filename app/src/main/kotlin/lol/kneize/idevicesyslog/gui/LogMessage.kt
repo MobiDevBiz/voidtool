@@ -20,7 +20,6 @@ enum class LogLevel {
     NOTICE,
     INFO,
     DEBUG
-
 }
 
 data class LogMessage(

@@ -2,30 +2,25 @@
 
 package lol.kneize.idevicesyslog.gui
 
-import javafx.animation.KeyFrame
-import javafx.animation.Timeline
+
 import javafx.application.Platform
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
-import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.*
-import javafx.util.Duration
 import tornadofx.*
-import java.util.*
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
 import javafx.scene.paint.Color
 
 class AppView : View() {
     override val root = BorderPane()
-    val appController: AppController by inject()
+    private val appController: AppController by inject()
 
-    lateinit var rPanel: Pane
-    lateinit var controls: Pane
+    private lateinit var rPanel: Pane
     lateinit var logView: TableView<LogMessage>
     lateinit var keyword: TextField
 
@@ -33,15 +28,15 @@ class AppView : View() {
 val fooProperty = SimpleStringProperty()  // Or any other Property
 var foo by fooProperty
  */
-    val scroll = SimpleBooleanProperty()
-    val list: List<LogMessage> = mutableListOf()
+private val scroll = SimpleBooleanProperty()
+    private val list: List<LogMessage> = mutableListOf()
     val observableList: ObservableList<LogMessage> = FXCollections.observableList(list)
-    val filteredList = FilteredList<LogMessage>(observableList)
+    private val filteredList = FilteredList<LogMessage>(observableList)
 
 
 
     init {
-        title = "iOS system logs reader(idevicesyslog-gui)"
+        title = "Void tool"
 
         with (root) {
             style {
@@ -142,43 +137,12 @@ var foo by fooProperty
             }
         }
     }
-
-    fun shakeStage() {
-        val rand = Random()
-        var dir = false
-        var alter = false
-        val cycleCount = 12
-        var diff = 0
-        val amp = 5
-        val keyframeDuration = Duration.seconds(0.04)
-
-        val stage = FX.primaryStage
-
-        val timeline = Timeline(KeyFrame(keyframeDuration, EventHandler {
-            val move = if(dir) {
-                diff
-            } else {
-                diff = rand.nextInt() % (amp * 2) - amp
-                alter = !alter
-                diff
-            }
-            stage.x += move * if(dir) -1 else 1
-            stage.y += move * if(dir xor alter) -1 else 1
-            dir = !dir
-        }))
-        timeline.cycleCount = cycleCount
-        timeline.play()
-    }
 }
 
 private val cellFormatter: TableCell<LogMessage, String>.(String) -> Unit = {
     style(append = true) {
         focusColor = Color.RED
         accentColor = Color.RED
-//        borderColor += box(
-//                top = Color.DARKCYAN,
-//                bottom = Color.DARKCYAN
-//        )
         backgroundColor += when(rowItem.logLevel) {
             LogLevel.EMERGENCY -> Color.RED
             LogLevel.ALERT -> Color.ORANGERED
@@ -193,8 +157,6 @@ private val cellFormatter: TableCell<LogMessage, String>.(String) -> Unit = {
 
         textFill = Color.BLACK
         text = item
-
-
         highlightTextFill = Color.WHITE
     }
 }
