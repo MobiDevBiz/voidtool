@@ -26,14 +26,13 @@ class AppController : Controller() {
 
     private var lastMessage: LogMessage? = null
     private fun appendLogMessage(log: LogMessage? = null) {
-        println(log)
         lastMessage?.let { it -> runLater { appView.observableList.add(it) } }
         lastMessage = log
     }
+
     private fun appendStringMessage(continuation: String) {
-        println(continuation)
         val previous = lastMessage
-        if(previous != null) {
+        if (previous != null) {
             lastMessage = previous.copy(message = "${previous.message}\n$continuation")
         } else {
             runLater { appView.observableList.add(LogMessage("", "", "", "", continuation)) }
@@ -138,7 +137,7 @@ class AppController : Controller() {
         val diskImagePath = diskImageLocation.resolve("DeveloperDiskImage.dmg")
         val diskImageSignaturePath = diskImageLocation.resolve("DeveloperDiskImage.dmg.signature")
 
-        if(!Files.isRegularFile(diskImagePath) || !Files.isRegularFile(diskImageSignaturePath)) {
+        if (!Files.isRegularFile(diskImagePath) || !Files.isRegularFile(diskImageSignaturePath)) {
             appView.alertProbWithDiskImage()
         } else {
             runBinaryIfPresent(
@@ -158,7 +157,7 @@ class AppController : Controller() {
         mountDevImage()
         val timestamp = LocalDateTime.now().format(ofPattern("yyyy-MM-dd-HH-mm-ss"))
         val targetDir = System.getProperty("user.dir")
-        val screenshotsPath =  Files.createDirectories(Paths.get(targetDir, "screenshots"))
+        val screenshotsPath = Files.createDirectories(Paths.get(targetDir, "screenshots"))
         val pathToSaveScreenshot = screenshotsPath.resolve("screenshot-$timestamp.tiff")
         runBinaryIfPresent("idevicescreenshot", pathToSaveScreenshot.toString())?.apply {
             inputStream.bufferedReader().readLine()?.let {

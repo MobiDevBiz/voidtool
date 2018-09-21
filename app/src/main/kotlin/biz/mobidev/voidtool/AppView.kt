@@ -31,9 +31,9 @@ class AppView : View() {
             null
         } ui {
             alert(
-                type = Alert.AlertType.ERROR,
-                header = "Binary is missing",
-                content = "Check that $binary is in PATH"
+                    type = Alert.AlertType.ERROR,
+                    header = "Binary is missing",
+                    content = "Check that $binary is in PATH"
             )
         }
     }
@@ -43,9 +43,9 @@ class AppView : View() {
             null
         } ui {
             alert(
-                type = Alert.AlertType.ERROR,
-                header = "Developer image is missing",
-                content = "Check that dev_image direcory exists"
+                    type = Alert.AlertType.ERROR,
+                    header = "Developer image is missing",
+                    content = "Check that dev_image directory exists"
             )
         }
     }
@@ -54,10 +54,10 @@ class AppView : View() {
     init {
         title = "Void tool"
 
-        with (root) {
+        with(root) {
             style {
                 padding = box(0.px)
-                setMinSize(800.0,600.0)
+                setMinSize(800.0, 600.0)
             }
 
             right {
@@ -67,7 +67,7 @@ class AppView : View() {
                     keyword = textfield {
                         promptText = "Filter"
                         textProperty().addListener { _, _, newValue: String ->
-                            if(newValue.isEmpty()) {
+                            if (newValue.isEmpty()) {
                                 filteredList.setPredicate(null)
                             } else {
                                 filteredList.setPredicate { it.matchesFilter(newValue) }
@@ -100,11 +100,11 @@ class AppView : View() {
                     }
                     button("Make screenshot") {
                         maxWidth = Double.MAX_VALUE
-                        setOnAction {appController.makeScreenshot() }
+                        setOnAction { appController.makeScreenshot() }
                     }
                     button("Mount dev image") {
                         maxWidth = Double.MAX_VALUE
-                        setOnAction {appController.mountDevImage() }
+                        setOnAction { appController.mountDevImage() }
                     }
                     button("Exit") {
                         maxWidth = Double.MAX_VALUE
@@ -155,7 +155,7 @@ private val cellFormatter: TableCell<LogMessage, String>.(String) -> Unit = {
     style(append = true) {
         focusColor = Color.RED
         accentColor = Color.RED
-        backgroundColor += when(rowItem.logLevel) {
+        backgroundColor += when (rowItem.logLevel) {
             LogLevel.EMERGENCY -> Color.RED
             LogLevel.ALERT -> Color.ORANGERED
             LogLevel.CRITICAL -> Color.SALMON

@@ -8,5 +8,4 @@ interface OSActions {
     fun executable(value: String): String
     @Throws(IOException::class)
     fun openDirectoryViewer(directory: File)
-    fun getDesktopPath(value: String): String
 }

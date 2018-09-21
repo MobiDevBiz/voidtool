@@ -31,7 +31,7 @@ data class LogMessage(
         val logLevelString: String,
         val message: String
 ) {
-    val logLevel: LogLevel = when(logLevelString.trim()) {
+    val logLevel: LogLevel = when (logLevelString.trim()) {
         "<Emergency>" -> LogLevel.EMERGENCY
         "<Alert>" -> LogLevel.ALERT
         "<Critical>" -> LogLevel.CRITICAL
@@ -59,11 +59,16 @@ data class LogMessage(
             logDate.contains(filter, ignoreCase = true)
 }
 
-@Language("RegExp") private val syslogDate = """\w{3}\s+\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2}"""
-@Language("RegExp") private val syslogDeviceName = """.*?"""
-@Language("RegExp") private val syslogParentProcess = """.+(?:\(.+\))?\[\d+]"""
-@Language("RegExp") private val syslogLogLevel = """<\w+>"""
-@Language("RegExp") private val syslogMessageText = """.*"""
+@Language("RegExp")
+private val syslogDate = """\w{3}\s+\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2}"""
+@Language("RegExp")
+private val syslogDeviceName = """.*?"""
+@Language("RegExp")
+private val syslogParentProcess = """.+(?:\(.+\))?\[\d+]"""
+@Language("RegExp")
+private val syslogLogLevel = """<\w+>"""
+@Language("RegExp")
+private val syslogMessageText = """.*"""
 private val syslogMessageRegex = Regex(
         "($syslogDate)\\s+" +
                 "($syslogDeviceName)\\s+" +
