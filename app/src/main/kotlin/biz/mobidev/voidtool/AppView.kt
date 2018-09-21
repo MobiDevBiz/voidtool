@@ -28,10 +28,24 @@ class AppView : View() {
 
     fun informOfAbsentTool(binary: String) {
         runAsync {
+            null
+        } ui {
             alert(
-                    type = Alert.AlertType.ERROR,
-                    header = "Binary is missing",
-                    content = "Check that $binary is in PATH"
+                type = Alert.AlertType.ERROR,
+                header = "Binary is missing",
+                content = "Check that $binary is in PATH"
+            )
+        }
+    }
+
+    fun alertProbWithDiskImage() {
+        runAsync {
+            null
+        } ui {
+            alert(
+                type = Alert.AlertType.ERROR,
+                header = "Developer image is missing",
+                content = "Check that dev_image direcory exists"
             )
         }
     }

@@ -139,8 +139,7 @@ class AppController : Controller() {
         val diskImageSignaturePath = diskImageLocation.resolve("DeveloperDiskImage.dmg.signature")
 
         if(!Files.isRegularFile(diskImagePath) || !Files.isRegularFile(diskImageSignaturePath)) {
-            // TODO appView.alertProbWithDiskImage()
-            println("no dev image")
+            appView.alertProbWithDiskImage()
         } else {
             runBinaryIfPresent(
                     "ideviceimagemounter",
