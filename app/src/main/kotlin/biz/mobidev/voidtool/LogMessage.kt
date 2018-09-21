@@ -1,4 +1,6 @@
-package lol.kneize.idevicesyslog.gui
+package biz.mobidev.voidtool
+
+import org.intellij.lang.annotations.Language
 
 /*
     Level 0 – “Emergency”
@@ -56,3 +58,25 @@ data class LogMessage(
             parentProcess.contains(filter, ignoreCase = true) ||
             logDate.contains(filter, ignoreCase = true)
 }
+
+@Language("RegExp") private val syslogDate = """\w{3}\s+\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2}"""
+@Language("RegExp") private val syslogDeviceName = """.*?"""
+@Language("RegExp") private val syslogParentProcess = """.+(?:\(.+\))?\[\d+]"""
+@Language("RegExp") private val syslogLogLevel = """<\w+>"""
+@Language("RegExp") private val syslogMessageText = """.*"""
+private val syslogMessageRegex = Regex(
+        "($syslogDate)\\s+" +
+                "($syslogDeviceName)\\s+" +
+                "($syslogParentProcess)\\s+" +
+                "($syslogLogLevel):\\s+" +
+                "($syslogMessageText)")
+
+fun String.parseLogMessage(): LogMessage? =
+        syslogMessageRegex.matchEntire(this)?.let {
+            LogMessage(
+                    it.groupValues[1],
+                    it.groupValues[2],
+                    it.groupValues[3],
+                    it.groupValues[4],
+                    it.groupValues[5])
+        }

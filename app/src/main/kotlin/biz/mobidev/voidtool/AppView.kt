@@ -1,7 +1,4 @@
-@file:Suppress("NAME_SHADOWING")
-
-package lol.kneize.idevicesyslog.gui
-
+package biz.mobidev.voidtool
 
 import javafx.application.Platform
 import javafx.beans.property.SimpleBooleanProperty
@@ -11,10 +8,10 @@ import javafx.collections.ListChangeListener
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.*
-import tornadofx.*
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
 import javafx.scene.paint.Color
+import tornadofx.*
 
 class AppView : View() {
     override val root = BorderPane()
@@ -24,15 +21,20 @@ class AppView : View() {
     lateinit var logView: TableView<LogMessage>
     lateinit var keyword: TextField
 
-/*
-val fooProperty = SimpleStringProperty()  // Or any other Property
-var foo by fooProperty
- */
-private val scroll = SimpleBooleanProperty()
-    private val list: List<LogMessage> = mutableListOf()
+    private val scroll = SimpleBooleanProperty()
+    private val list = mutableListOf<LogMessage>()
     val observableList: ObservableList<LogMessage> = FXCollections.observableList(list)
-    private val filteredList = FilteredList<LogMessage>(observableList)
+    val filteredList = FilteredList<LogMessage>(observableList)
 
+    fun informOfAbsentTool(binary: String) {
+        runAsync {
+            alert(
+                    type = Alert.AlertType.ERROR,
+                    header = "Binary is missing",
+                    content = "Check that $binary is in PATH"
+            )
+        }
+    }
 
 
     init {
@@ -42,15 +44,15 @@ private val scroll = SimpleBooleanProperty()
             style {
                 padding = box(0.px)
                 setMinSize(800.0,600.0)
-
             }
+
             right {
                 rPanel = vbox(10.0) {
                     padding = tornadofx.insets(10.0)
                     alignment = Pos.CENTER_RIGHT
                     keyword = textfield {
                         promptText = "Filter"
-                        textProperty().addListener { _: ObservableValue<*>, _: String, newValue: String ->
+                        textProperty().addListener { _, _, newValue: String ->
                             if(newValue.isEmpty()) {
                                 filteredList.setPredicate(null)
                             } else {
@@ -59,22 +61,20 @@ private val scroll = SimpleBooleanProperty()
                         }
                     }
 
-
                     button("Run") {
                         isDefaultButton = true
                         maxWidth = Double.MAX_VALUE
-                        setOnAction {
-                            appController.startAppendingRows()
-                        }
+                        setOnAction { appController.startCollectingLogs() }
                     }
                     button("Stop") {
                         maxWidth = Double.MAX_VALUE
-                        setOnAction {appController.stopCollectingLogs()}
+                        setOnAction { appController.stopCollectingLogs() }
                     }
 
                     button("To clipboard") {
                         maxWidth = Double.MAX_VALUE
                         setOnAction { appController.copyToClipboard() }
+
                     }
                     button("To File") {
                         maxWidth = Double.MAX_VALUE
@@ -86,15 +86,15 @@ private val scroll = SimpleBooleanProperty()
                     }
                     button("Make screenshot") {
                         maxWidth = Double.MAX_VALUE
-                        setOnAction {appController.makeScreenshot()}
+                        setOnAction {appController.makeScreenshot() }
                     }
                     button("Mount dev image") {
                         maxWidth = Double.MAX_VALUE
-                        setOnAction {appController.mountDevImage()}
+                        setOnAction {appController.mountDevImage() }
                     }
                     button("Exit") {
                         maxWidth = Double.MAX_VALUE
-                        setOnAction {appController.exit()}
+                        setOnAction { appController.exit() }
                     }
                 }
             }
@@ -102,7 +102,6 @@ private val scroll = SimpleBooleanProperty()
                 vbox {
                     padding = tornadofx.insets(10f)
                     maxHeight = Double.MAX_VALUE
-
                     logView = tableview<LogMessage>(filteredList) {
                         readonlyColumn("Date", LogMessage::logDate).cellFormat(cellFormatter)
                         readonlyColumn("Device Name", LogMessage::deviceName).cellFormat(cellFormatter)
@@ -123,8 +122,7 @@ private val scroll = SimpleBooleanProperty()
                                 val size = items.size
                                 if (size > 0) {
                                     scrollTo(size - 1)
-                                } else { items.removeListener{ c: ListChangeListener.Change<*> ->
-                                    c.next()}}
+                                }
                             }
                         }
                     }

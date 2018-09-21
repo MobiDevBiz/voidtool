@@ -1,4 +1,4 @@
-package lol.kneize.idevicesyslog.gui.os
+package biz.mobidev.voidtool.os
 
 import java.io.IOException
 import java.io.File

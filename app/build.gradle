@@ -1,7 +1,7 @@
 plugins {
-	id 'kotlin'
-	id 'application'
-	id 'com.github.johnrengelman.shadow'
+    id 'kotlin'
+    id 'application'
+    id 'com.github.johnrengelman.shadow'
 }
 
 dependencies {
@@ -9,7 +9,7 @@ dependencies {
     compile 'no.tornado:tornadofx:1.7.17'
 }
 
-mainClassName = 'lol.kneize.idevicesyslog.gui.AppModelKt'
+mainClassName = 'lol.kneize.idevicesyslog.gui.App'
 
 sourceCompatibility = 8
 targetCompatibility = 8

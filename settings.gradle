@@ -1,3 +1,2 @@
-rootProject.name = 'idevicesyslog.gui'
-include 'app'
-
+rootProject.name = 'voidtool'
+include ':app'

@@ -1,4 +1,4 @@
-package lol.kneize.idevicesyslog.gui.os
+package biz.mobidev.voidtool.os
 
 enum class OS constructor(private val actions: OSActions) {
     WINDOWS(WindowsActions()),
@@ -16,8 +16,7 @@ enum class OS constructor(private val actions: OSActions) {
                 }
             }
 
-        fun getActions(): OSActions {
-            return current.actions
-        }
+        val actions: OSActions
+            get() = current.actions
     }
 }
