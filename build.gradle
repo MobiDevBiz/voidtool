@@ -14,8 +14,8 @@ plugins {
 }
 
 allprojects {
-    group 'lol.kneize'
-    version '0.1-beta'
+    group 'biz.mobidev'
+    version '1.0.0'
 }
 
 subprojects {
