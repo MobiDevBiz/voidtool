@@ -22,7 +22,7 @@ App is a tool that aids in development and quality assurance processes for iOS a
 
 `brew install adoptopenjdk-openjdk8` -- for macOS
 
-Visit this [link](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) to download Windows binaries of JDK8, don't forget to add it to `PATH`
+Visit this [link](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) to download Windows binaries of JDK8, don't forget to add it to [PATH](https://java.com/en/download/help/path.xml)
 
 ### Build jar
 
