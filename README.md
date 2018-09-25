@@ -1,10 +1,10 @@
 # voidtool
 
-## Very Omnipotent iOS Device Tool
+### Very Omnipotent iOS Device Tool
 
 ## What it is?
 
-App itself is wrapper around binaries of (libimobiledevice)[https://github.com/libimobiledevice]. Written in Kotlin.
+App itself is wrapper around binaries of [libimobiledevice](https://github.com/libimobiledevice). Written in Kotlin.
 
 ## Features
 
