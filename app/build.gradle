@@ -9,7 +9,7 @@ dependencies {
     compile 'no.tornado:tornadofx:1.7.17'
 }
 
-mainClassName = 'lol.kneize.idevicesyslog.gui.App'
+mainClassName = 'biz.mobidev.voidtool.App'
 
 sourceCompatibility = 8
 targetCompatibility = 8
@@ -19,5 +19,5 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 }
 
 shadowJar {
-    baseName = 'idevicesyslog-gui'
+    baseName = 'voidtool'
 }
