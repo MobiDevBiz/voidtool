@@ -30,6 +30,15 @@ Visit this [link](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-
 
 * `./gradlew shadowJar` on macOS/Linux terminal or `.\gradlew shadowJar` on Windows command prompt
 
+## Run
+
+Just double click on jar file or run it from command line `java -jar voidtool.jar`
+
+### Troubleshooting
+
+1. Be sure that binaries are in PATH or in same directory as *.jar file
+2. Run binary from command line to be sure that it's working properly
+
 ## Documentation
 
 To be done
