@@ -137,7 +137,7 @@ class AppView : View() {
                             fontFamily = "Monospaced"
                         }
 
-                        columnResizePolicy = SmartResize.POLICY
+                        //columnResizePolicy = SmartResize.POLICY
                         if (scroll.value) {
                             items.addListener { c: ListChangeListener.Change<*> ->
                                 c.next()

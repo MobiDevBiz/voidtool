@@ -1,8 +1,10 @@
 buildscript {
-    ext.kotlin_version = '1.2.70'
+    ext.kotlin_version = '1.5.10'
 
     repositories {
-        jcenter()
+        mavenCentral()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -10,7 +12,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '2.0.4' apply false
+    id 'com.github.johnrengelman.shadow' version '7.0.0' apply false
 }
 
 allprojects {
@@ -20,6 +22,6 @@ allprojects {
 
 subprojects {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }

@@ -2,22 +2,36 @@ plugins {
     id 'kotlin'
     id 'application'
     id 'com.github.johnrengelman.shadow'
+    id 'org.openjfx.javafxplugin' version "0.0.10"
 }
 
+application {
+    getMainClass().set('biz.mobidev.voidtool.App')
+}
+
+
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile 'no.tornado:tornadofx:1.7.17'
+    //compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'no.tornado:tornadofx:1.7.20'
+    //implementation 'no.tornado:tornadofx:2.0.0-SNAPSHOT'
+}
+
+javafx {
+    version = "11"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
 mainClassName = 'biz.mobidev.voidtool.App'
 
-sourceCompatibility = 8
-targetCompatibility = 8
+//sourceCompatibility = 8
+//targetCompatibility = 8
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions.jvmTarget = '11'
 }
 
 shadowJar {
-    baseName = 'voidtool'
+    getArchiveBaseName().set('voidtool')
+
+    mainClassName = 'biz.mobidev.voidtool.App'
 }
